@@ -84,12 +84,12 @@ function isPumpDump(coin) {
   const priceChange = Math.abs(coin.price_change_percentage_24h || 0);
   const volumeRatio = coin.total_volume / (coin.market_cap || 1);
   return priceChange > 15 && volumeRatio > 0.3;
-}async function sendTelegram(botToken, chatId, text) {
+async function sendTelegram(botToken, chatId, text) {
   try {
-    const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+    const res = await fetch(`https://kripto-monitor.onrender.com/telegram`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: chatId, text, parse_mode: "HTML" }),
+      body: JSON.stringify({ text }),
     });
     return res.ok;
   } catch (e) {
