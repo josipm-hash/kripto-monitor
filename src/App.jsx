@@ -84,6 +84,7 @@ function isPumpDump(coin) {
   const priceChange = Math.abs(coin.price_change_percentage_24h || 0);
   const volumeRatio = coin.total_volume / (coin.market_cap || 1);
   return priceChange > 15 && volumeRatio > 0.3;
+  }
 async function sendTelegram(botToken, chatId, text) {
   try {
     const res = await fetch(`https://kripto-monitor.onrender.com/telegram`, {
