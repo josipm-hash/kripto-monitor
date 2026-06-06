@@ -133,9 +133,7 @@ Odgovori SAMO JSON, bez ikakvog teksta prije ili poslije:
   } catch (e) {
     return { sentiment: "N/A", vijesti: "Nije dostupno", ulaz: "N/A", tp: "N/A", sl: "N/A", rr: "N/A", preporuka: "Analiza nedostupna", pouzdanost: "Niska" };
   }
-    return { sentiment: "N/A", vijesti: "Nije dostupno", ulaz: "N/A", tp: "N/A", sl: "N/A", rr: "N/A", preporuka: "Analiza nedostupna", pouzdanost: "Niska" };
-  }
-}async function fetchTopCoins(apiKey) {
+} async function fetchTopCoins(apiKey) {
   const headers = { "Accept": "application/json" };
   if (apiKey && apiKey.startsWith("CG-")) {
     headers["x-cg-demo-api-key"] = apiKey;
