@@ -61,9 +61,15 @@ Odgovori u JSON formatu:
       }
     );
 
-    const text = aiResponse.data.content[0].text;
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    const analysis = JSON.parse(jsonMatch[0]);
+   const text = aiResponse.data.content[0].text;
+console.log('AI ODGOVOR:', text); // DEBUG
+
+const jsonMatch = text.match(/\{[\s\S]*\}/);
+if (!jsonMatch) {
+  console.error('Nema JSON-a u odgovoru:', text);
+  throw new Error('AI nije vratio JSON');
+}
+const analysis = JSON.parse(jsonMatch[0]);
 
     // Pošalji Telegram ako je jak signal
     if (analysis.signal === 'DA') {
