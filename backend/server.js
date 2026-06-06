@@ -1,0 +1,105 @@
+const express = require('express');
+const cors = require('cors');
+const axios = require('axios');
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
+const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+const COINGECKO_API = process.env.COINGECKO_API;
+const ANTHROPIC_API = process.env.ANTHROPIC_API;
+
+// Health check
+app.get('/', (req, res) => {
+  res.json({ status: 'Kripto Monitor Backend radi!' });
+});
+
+// AI analiza endpoint
+app.post('/analyze', async (req, res) => {
+  const { coin, rsi, macd, volume, price, support, resistance } = req.body;
+
+  try {
+    // Claude AI analiza
+    const aiResponse = await axios.post(
+      'https://api.anthropic.com/v1/messages',
+      {
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: `Analiziraj kriptovalutu za kratkoročno trgovanje na hrvatskom jeziku.
+          
+Valuta: ${coin}
+Cijena: $${price}
+RSI: ${rsi}
+MACD: ${macd}
+Volume promjena: ${volume}%
+Support: $${support}
+Resistance: $${resistance}
+
+Daj:
+1. Je li ovo dobar signal za ulaz? (DA/NE/ČEKAJ)
+2. Preporučena cijena ulaza
+3. Take Profit (TP) cijena
+4. Stop Loss (SL) cijena
+5. Omjer rizik/nagrada
+6. Je li ovo pump & dump? (DA/NE/SUMNJA)
+7. Kratko objašnjenje (2-3 rečenice)
+
+Odgovori u JSON formatu:
+{"signal":"DA/NE/ČEKAJ","entry":0,"tp":0,"sl":0,"rr":"1:2","pump":"NE","explanation":"tekst"}`
+        }]
+      },
+      {
+        headers: {
+          'x-api-key': ANTHROPIC_API,
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json'
+        }
+      }
+    );
+
+    const text = aiResponse.data.content[0].text;
+    const clean = text.replace(/```json|```/g, '').trim();
+    const analysis = JSON.parse(clean);
+
+    // Pošalji Telegram ako je jak signal
+    if (analysis.signal === 'DA') {
+      const msg = `🚨 SIGNAL - ${coin}
+━━━━━━━━━━━━━━━
+💰 Cijena: $${price}
+📊 RSI: ${rsi} | MACD: ${macd}
+📈 Volume: +${volume}%
+
+🎯 PREPORUKA:
+Ulaz: $${analysis.entry}
+TP: $${analysis.tp}
+SL: $${analysis.sl}
+R/R: ${analysis.rr}
+
+⚠️ Pump & Dump: ${analysis.pump}
+
+💬 ${analysis.explanation}
+━━━━━━━━━━━━━━━
+⚠️ Nije financijski savjet!`;
+
+      await axios.post(
+        `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`,
+        { chat_id: TELEGRAM_CHAT_ID, text: msg }
+      );
+    }
+
+    res.json({ success: true, analysis });
+
+  } catch (error) {
+    console.error('Greška:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`Backend pokrenut na portu ${PORT}`);
+});
