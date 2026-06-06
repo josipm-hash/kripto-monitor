@@ -62,8 +62,8 @@ Odgovori u JSON formatu:
     );
 
     const text = aiResponse.data.content[0].text;
-    const clean = text.replace(/```json|```/g, '').trim();
-    const analysis = JSON.parse(clean);
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    const analysis = JSON.parse(jsonMatch[0]);
 
     // Pošalji Telegram ako je jak signal
     if (analysis.signal === 'DA') {
