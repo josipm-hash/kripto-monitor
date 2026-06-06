@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+const BACKEND_URL = "https://kripto-monitor.onrender.com";
 
 function calcRSI(prices, period = 14) {
   if (prices.length < period + 1) return null;
