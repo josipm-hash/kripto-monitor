@@ -115,20 +115,24 @@ Odgovori SAMO JSON, bez ikakvog teksta prije ili poslije:
 {"sentiment":"Bullish/Bearish/Neutral","vijesti":"kratki opis situacije","ulaz":"$cijena","tp":"$cijena","sl":"$cijena","rr":"1:X","preporuka":"1-2 rečenice","pouzdanost":"Visoka/Srednja/Niska"}`;
 
   try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    const response = await fetch(`${BACKEND_URL}/analyze`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 500,
-        messages: [{ role: "user", content: prompt }],
+        coin: `${coin.name} (${coin.symbol.toUpperCase()})`,
+        rsi: technicals.rsi,
+        macd: technicals.macd?.signal,
+        volume: technicals.volumeSpike ? 200 : 50,
+        price: coin.current_price,
+        support: technicals.sr?.support,
+        resistance: technicals.sr?.resistance
       }),
     });
     const data = await response.json();
-    const text = data.content?.map(i => i.text || "").join("") || "";
-    const clean = text.replace(/```json|```/g, "").trim();
-    return JSON.parse(clean);
+    return data.analysis;
   } catch (e) {
+    return { sentiment: "N/A", vijesti: "Nije dostupno", ulaz: "N/A", tp: "N/A", sl: "N/A", rr: "N/A", preporuka: "Analiza nedostupna", pouzdanost: "Niska" };
+  }
     return { sentiment: "N/A", vijesti: "Nije dostupno", ulaz: "N/A", tp: "N/A", sl: "N/A", rr: "N/A", preporuka: "Analiza nedostupna", pouzdanost: "Niska" };
   }
 }async function fetchTopCoins(apiKey) {
