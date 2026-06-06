@@ -104,6 +104,18 @@ R/R: ${analysis.rr}
     res.status(500).json({ error: error.message });
   }
 });
+app.post('/telegram', async (req, res) => {
+  try {
+    const { text } = req.body;
+    await axios.post(
+      `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`,
+      { chat_id: TELEGRAM_CHAT_ID, text, parse_mode: 'HTML' }
+    );
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
