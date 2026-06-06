@@ -158,7 +158,8 @@ async function fetchCoinHistory(coinId, apiKey) {
   if (!res.ok) return [];
   const data = await res.json();
   return data.prices?.map(p => p[1]) || [];
-}export default function KriptoMonitor() {
+}
+  export default function KriptoMonitor() {
   const [step, setStep] = useState("setup");
   const [cgKey, setCgKey] = useState("");
   const [tgToken, setTgToken] = useState("");
