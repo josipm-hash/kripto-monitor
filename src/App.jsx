@@ -287,7 +287,7 @@ Ulaz: ${ai?.entry ?? ai?.ulaz ?? "N/A"}
 TP: ${ai?.tp ?? "N/A"}
 Stop Loss: ${ai?.sl ?? "N/A"}
 R/R: ${ai?.rr ?? "N/A"}
-${ai?.explanation ?? ai?.preporuka ?? ""}
+${ai?.explanation ?? ai?.preporuka ?? "NEMA EXPLANATION"}
 
 ⚠️ Pump&Dump: ${t.pumpDump ? "⚠️ SUMNJA!" : "✅ Organski"}
 Pouzdanost: ${ai?.pouzdanost ?? "N/A"}
