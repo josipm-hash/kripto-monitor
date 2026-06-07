@@ -130,9 +130,10 @@ Odgovori SAMO JSON, bez ikakvog teksta prije ili poslije:
       }),
     });
     const data = await response.json();
+    console.log('ANALYSIS:', JSON.stringify(data.analysis));
     return data.analysis;
   } catch (e) {
-    return { sentiment: "N/A", vijesti: "Nije dostupno", ulaz: "N/A", tp: "N/A", sl: "N/A", rr: "N/A", preporuka: "Analiza nedostupna", pouzdanost: "Niska" };
+  return { sentiment: "N/A", explanation: "Analiza nedostupna", ulaz: "N/A", tp: "N/A", sl: "N/A", rr: "N/A", pouzdanost: "Niska" };
   }
 } async function fetchTopCoins(apiKey) {
   const headers = { "Accept": "application/json" };
