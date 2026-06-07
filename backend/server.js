@@ -46,7 +46,7 @@ Daj:
 4. Stop Loss (SL) cijena
 5. Omjer rizik/nagrada
 6. Je li ovo pump & dump? (DA/NE/SUMNJA)
-7. Kratko objašnjenje (2-3 rečenice)
+7. Objašnjenje u jednoj kratkoj rečenici (max 100 znakova)
 
 Odgovori u JSON formatu:
 {"signal":"DA/NE/CEKAJ","ulaz":0,"tp":0,"sl":0,"rr":"1:2","pump":"NE/SUMNJA","sentiment":"Bullish/Bearish/Neutral","pouzdanost":"Visoka/Srednja/Niska","explanation":"tekst"}
