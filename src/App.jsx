@@ -280,14 +280,14 @@ Fib 0.618: $${t.fib?.r618?.toFixed(2) ?? "N/A"}
 
 📰 <b>FUNDAMENTALI:</b>
 Sentiment: ${ai?.sentiment ?? "N/A"}
-${ai?.vijesti ?? ""}
+${ai?.explanation ?? ai?.vijesti ?? ""}
 
 🎯 <b>PREPORUKA:</b>
-Ulaz: ${ai?.ulaz ?? "N/A"}
+Ulaz: ${ai?.entry ?? ai?.ulaz ?? "N/A"}
 TP: ${ai?.tp ?? "N/A"}
 Stop Loss: ${ai?.sl ?? "N/A"}
 R/R: ${ai?.rr ?? "N/A"}
-${ai?.preporuka ?? ""}
+${ai?.explanation ?? ai?.preporuka ?? ""}
 
 ⚠️ Pump&Dump: ${t.pumpDump ? "⚠️ SUMNJA!" : "✅ Organski"}
 Pouzdanost: ${ai?.pouzdanost ?? "N/A"}
