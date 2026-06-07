@@ -49,8 +49,8 @@ Daj:
 7. Kratko objašnjenje (2-3 rečenice)
 
 Odgovori u JSON formatu:
-{"signal":"DA/NE/ČEKAJ","ulaz":0,"tp":0,"sl":0,"rr":"1:2","pump":"NE/SUMNJA","sentiment":"Bullish/Bearish/Neutral","pouzdanost":"Visoka/Srednja/Niska","explanation":"tekst"}
-        }]
+{"signal":"DA/NE/CEKAJ","ulaz":0,"tp":0,"sl":0,"rr":"1:2","pump":"NE/SUMNJA","sentiment":"Bullish/Bearish/Neutral","pouzdanost":"Visoka/Srednja/Niska","explanation":"tekst"}
+        `}]
       },
       {
         headers: {
