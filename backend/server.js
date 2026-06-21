@@ -46,7 +46,7 @@ Daj:
 4. Stop Loss (SL) cijena
 5. Omjer rizik/nagrada
 6. Je li ovo pump & dump? (DA/NE/SUMNJA)
-7. Objašnjenje u jednoj kratkoj rečenici (max 100 znakova)
+7. Objašnjenje za POČETNIKE - piši jednostavnim jezikom kao da objašnjavaš prijatelju koji ne zna ništa o tradingu. Kratko objasni termine u zagradama (npr. "RSI je nizak (što znači da se puno prodavalo)"). Max 200 znakova, 1-2 rečenice.
 
 Odgovori u JSON formatu:
 {"signal":"DA/NE/CEKAJ","ulaz":0,"tp":0,"sl":0,"rr":"1:2","pump":"NE/SUMNJA","sentiment":"Bullish/Bearish/Neutral","pouzdanost":"Visoka/Srednja/Niska","explanation":"tekst"}
