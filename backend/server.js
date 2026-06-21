@@ -119,6 +119,44 @@ app.post('/telegram', async (req, res) => {
   }
 });
 
+// RSS izvori za vijesti
+const RSS_FEEDS = [
+  { name: 'CoinTelegraph', url: 'https://cointelegraph.com/rss' },
+  { name: 'CoinDesk', url: 'https://www.coindesk.com/arc/outboundfeeds/rss/' },
+  { name: 'CryptoPanic', url: 'https://cryptopanic.com/news/rss/' }
+];
+
+// Dohvati vijesti sa svih RSS izvora
+async function fetchAllNews() {
+  const allNews = [];
+  for (const feed of RSS_FEEDS) {
+    try {
+      const parsed = await rssParser.parseURL(feed.url);
+      const items = parsed.items.slice(0, 15).map(item => ({
+        source: feed.name,
+        title: item.title,
+        link: item.link,
+        pubDate: item.pubDate,
+        summary: item.contentSnippet || ''
+      }));
+      allNews.push(...items);
+    } catch (err) {
+      console.error(`Greška kod dohvaćanja ${feed.name}:`, err.message);
+    }
+  }
+  return allNews;
+}
+
+// Endpoint za testiranje dohvata vijesti
+app.get('/news-fetch', async (req, res) => {
+  try {
+    const news = await fetchAllNews();
+    res.json({ success: true, count: news.length, news });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Backend pokrenut na portu ${PORT}`);
