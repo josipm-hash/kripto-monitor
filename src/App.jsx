@@ -223,10 +223,12 @@ export default function KriptoMonitor() {
         const technicals = { rsi, macd, bollinger, sr, cross: crossData, fib, volumeSpike, pumpDump, currentPrice: coin.current_price };
         const score = scoreSignal(technicals);
 
-        if (score >= 3) {
-          results.push({ coin, technicals, score, ai: null });
-        }
-      }
+      const stablecoins = ["usdt", "usdc", "dai", "busd", "tusd", "usdd", "fdusd"];
+const isStablecoin = stablecoins.includes(coin.symbol.toLowerCase());
+
+if (score >= 3 && !isStablecoin) {
+  results.push({ coin, technicals, score, ai: null });
+}
 
       results.sort((a, b) => b.score - a.score);
       const top5 = results.slice(0, 5);
