@@ -229,6 +229,7 @@ const isStablecoin = stablecoins.includes(coin.symbol.toLowerCase());
 if (score >= 3 && !isStablecoin) {
   results.push({ coin, technicals, score, ai: null });
 }
+      }
 
       results.sort((a, b) => b.score - a.score);
       const top5 = results.slice(0, 5);
