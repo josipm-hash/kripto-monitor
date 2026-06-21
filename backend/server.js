@@ -122,8 +122,7 @@ app.post('/telegram', async (req, res) => {
 // RSS izvori za vijesti
 const RSS_FEEDS = [
   { name: 'CoinTelegraph', url: 'https://cointelegraph.com/rss' },
-  { name: 'CoinDesk', url: 'https://www.coindesk.com/arc/outboundfeeds/rss/' },
-  { name: 'CryptoPanic', url: 'https://cryptopanic.com/news/rss/' }
+  { name: 'CoinDesk', url: 'https://www.coindesk.com/arc/outboundfeeds/rss/' }
 ];
 
 // Dohvati vijesti sa svih RSS izvora
