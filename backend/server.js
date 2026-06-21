@@ -156,6 +156,42 @@ app.get('/news-fetch', async (req, res) => {
   }
 });
 
+// Dohvati postove s Reddit r/CryptoCurrency
+async function fetchRedditPosts() {
+  try {
+    const response = await axios.get(
+      'https://www.reddit.com/r/CryptoCurrency/hot.json?limit=25',
+      {
+        headers: {
+          'User-Agent': 'kripto-monitor-app/1.0'
+        }
+      }
+    );
+    const posts = response.data.data.children.map(post => ({
+      title: post.data.title,
+      upvotes: post.data.ups,
+      numComments: post.data.num_comments,
+      link: `https://reddit.com${post.data.permalink}`,
+      created: new Date(post.data.created_utc * 1000).toISOString(),
+      selftext: post.data.selftext ? post.data.selftext.slice(0, 300) : ''
+    }));
+    return posts;
+  } catch (err) {
+    console.error('Greška kod dohvaćanja Reddita:', err.message);
+    return [];
+  }
+}
+
+// Endpoint za testiranje dohvata Reddit postova
+app.get('/reddit-fetch', async (req, res) => {
+  try {
+    const posts = await fetchRedditPosts();
+    res.json({ success: true, count: posts.length, posts });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Backend pokrenut na portu ${PORT}`);
