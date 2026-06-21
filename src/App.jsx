@@ -226,7 +226,7 @@ export default function KriptoMonitor() {
       const stablecoins = ["usdt", "usdc", "dai", "busd", "tusd", "usdd", "fdusd"];
 const isStablecoin = stablecoins.includes(coin.symbol.toLowerCase());
 
-if (score >= 1 && !isStablecoin) {
+if (score >= 3 && !isStablecoin) {
   results.push({ coin, technicals, score, ai: null });
 }
       }
