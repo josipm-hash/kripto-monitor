@@ -1,0 +1,24 @@
+name: Kripto Monitor Cron
+
+on:
+  schedule:
+    - cron: '0 */3 * * *'
+  workflow_dispatch:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pokreni price scan
+        run: |
+          curl -s -X POST https://kripto-monitor.onrender.com/analyze \
+            -H "Content-Type: application/json" \
+            -d '{"symbol":"BTC","prices":[1,2,3],"volumes":[1,2,3]}' || true
+
+      - name: Pokreni news scan
+        run: |
+          curl -s https://kripto-monitor.onrender.com/news-scan || true
+
+      - name: Probudi backend (wake-up ping)
+        run: |
+          curl -s https://kripto-monitor.onrender.com/health || true
