@@ -232,16 +232,31 @@ app.get('/news-scan', async (req, res) => {
   return `[${n.source} | ${date}] ${n.title} — ${n.summary?.slice(0, 100) || ''}`;
 }).join('\n');
 
-    // 2. Dohvati LunarCrush sentiment za TOP valute
-    const coins = ['BTC', 'ETH', 'SOL', 'BNB', 'ADA', 'AVAX', 'DOT', 'LINK'];
-    const sentimentResults = [];
-    for (const coin of coins) {
-      const s = await fetchLunarCrushSentiment(coin);
-      if (s) sentimentResults.push(s);
-    }
-    const sentimentText = sentimentResults.map(s =>
+    // 2. Fear & Greed Index + LunarCrush (ako dostupan)
+let fearGreedText = '';
+try {
+  const fgResponse = await axios.get('https://api.alternative.me/fng/');
+  const fgData = fgResponse.data.data[0];
+  const fgValue = fgData.value;
+  const fgLabel = fgData.value_classification;
+  fearGreedText = `Fear & Greed Index: ${fgValue}/100 — ${fgLabel}`;
+} catch (err) {
+  fearGreedText = 'Fear & Greed Index: nedostupan';
+}
+
+const coins = ['BTC', 'ETH', 'SOL', 'BNB', 'ADA', 'AVAX', 'DOT', 'LINK'];
+const sentimentResults = [];
+for (const coin of coins) {
+  const s = await fetchLunarCrushSentiment(coin);
+  if (s) sentimentResults.push(s);
+}
+const lunarText = sentimentResults.length > 0
+  ? sentimentResults.map(s =>
       `${s.symbol}: Galaxy Score=${s.galaxyScore}, Sentiment=${s.sentiment}, Social Volume=${s.socialVolume}`
-    ).join('\n');
+    ).join('\n')
+  : 'LunarCrush: nije dostupno (potreban plaćeni plan)';
+
+const sentimentText = `${fearGreedText}\n${lunarText}`;
 
     // 3. AI analiza vijesti + sentimenta
     const aiResponse = await axios.post(
@@ -256,7 +271,7 @@ app.get('/news-scan', async (req, res) => {
 VIJESTI (zadnjih sat vremena):
 ${newsText}
 
-SENTIMENT PODATCI (LunarCrush - Twitter+Reddit):
+SENTIMENT PODATCI:
 ${sentimentText}
 
 Za svaku valutu procijeni:
@@ -317,6 +332,9 @@ ${s.vijesti_summary}
 
 🌐 SENTIMENT (Twitter+Reddit):
 ${s.sentiment_opis}
+
+😨 FEAR & GREED INDEX:
+${fearGreedText}
 
 ${poklapanjeIcon} POKLAPANJE SIGNALA:
 ${s.razlog_poklapanja}
