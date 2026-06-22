@@ -3,7 +3,8 @@ const cors = require('cors');
 const axios = require('axios');
 const Parser = require('rss-parser');
 const rssParser = new Parser();
-
+// Pamćenje poslanih signala (zaštita od duplikata)
+const sentNewsCache = new Set();
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -223,9 +224,13 @@ app.get('/news-scan', async (req, res) => {
   try {
     // 1. Dohvati vijesti
     const news = await fetchAllNews();
-    const newsText = news.slice(0, 20).map(n =>
-      `[${n.source}] ${n.title} — ${n.summary?.slice(0, 100) || ''}`
-    ).join('\n');
+    const newsText = news.slice(0, 20).map(n => {
+  const date = n.pubDate ? new Date(n.pubDate).toLocaleString('hr-HR', {
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  }) : 'datum nepoznat';
+  return `[${n.source} | ${date}] ${n.title} — ${n.summary?.slice(0, 100) || ''}`;
+}).join('\n');
 
     // 2. Dohvati LunarCrush sentiment za TOP valute
     const coins = ['BTC', 'ETH', 'SOL', 'BNB', 'ADA', 'AVAX', 'DOT', 'LINK'];
@@ -299,7 +304,9 @@ Odgovori u JSON formatu:
 
     // 4. Pošalji Telegram za svaki jak signal
     for (const s of result.signals) {
-      if (s.signal === 'DA' || s.pouzdanost === 'Visoka') {
+     const cacheKey = `${s.coin}-${s.vijesti_summary?.slice(0, 50)}`;
+if ((s.signal === 'DA' || s.pouzdanost === 'Visoka') && !sentNewsCache.has(cacheKey)) {
+  sentNewsCache.add(cacheKey);
         const pumpIcon = s.pump_sumnja ? '⚠️ SUMNJA NA PUMP!' : '✅ Organski rast';
         const poklapanjeIcon = s.poklapanje?.includes('SLAŽU') ? '✅' : '⚠️';
 
