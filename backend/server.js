@@ -324,7 +324,11 @@ if ((s.signal === 'DA' || s.pouzdanost === 'Visoka') && !sentNewsCache.has(cache
   sentNewsCache.add(cacheKey);
         const pumpIcon = s.pump_sumnja ? '⚠️ SUMNJA NA PUMP!' : '✅ Organski rast';
         const poklapanjeIcon = s.poklapanje?.includes('SLAŽU') ? '✅' : '⚠️';
-
+const fgExplanation = fearGreedText.includes('Extreme Greed') ? '🔴 Svi žele kupiti — opasnost od pada!' :
+  fearGreedText.includes('Greed') ? '🟠 Tržište je pohlepno — budi oprezan.' :
+  fearGreedText.includes('Extreme Fear') ? '🟢 Svi prodaju od straha — moguće prilike!' :
+  fearGreedText.includes('Fear') ? '🟡 Tržište je nervozno — pazi na kvalitetu.' :
+  '⚪ Neutralno — tehnika je pouzdanija.';
         const msg = `🚨 NEWS SIGNAL - ${s.coin}
 ━━━━━━━━━━━━━━━
 📰 VIJESTI:
@@ -335,13 +339,7 @@ ${s.sentiment_opis}
 
 😨 FEAR & GREED INDEX:
 ${fearGreedText}
-${(() => {
-  if (fearGreedText.includes('Extreme Greed')) return '🔴 EKSTREMNA POHLEPA — svi žele kupiti, cijena može pasti. Ulazi oprezno!';
-  if (fearGreedText.includes('Greed')) return '🟠 POHLEPA — tržište je optimistično, ali pazi na preveliko oduševljenje.';
-  if (fearGreedText.includes('Extreme Fear')) return '🟢 EKSTREMNI STRAH — svi prodaju. Historijski, dobre prilike za kupnju!';
-  if (fearGreedText.includes('Fear')) return '🟡 STRAH — tržište je nervozno. Kvalitetne valute mogu biti podcijenjene.';
-  return '⚪ NEUTRALNO — nema ekstremnih emocija, tehnika je pouzdanija.';
-})()}
+${fgExplanation}
 
 ${poklapanjeIcon} POKLAPANJE SIGNALA:
 ${s.razlog_poklapanja}
