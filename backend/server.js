@@ -335,6 +335,13 @@ ${s.sentiment_opis}
 
 😨 FEAR & GREED INDEX:
 ${fearGreedText}
+${(() => {
+  if (fearGreedText.includes('Extreme Greed')) return '🔴 EKSTREMNA POHLEPA — svi žele kupiti, cijena može pasti. Ulazi oprezno!';
+  if (fearGreedText.includes('Greed')) return '🟠 POHLEPA — tržište je optimistično, ali pazi na preveliko oduševljenje.';
+  if (fearGreedText.includes('Extreme Fear')) return '🟢 EKSTREMNI STRAH — svi prodaju. Historijski, dobre prilike za kupnju!';
+  if (fearGreedText.includes('Fear')) return '🟡 STRAH — tržište je nervozno. Kvalitetne valute mogu biti podcijenjene.';
+  return '⚪ NEUTRALNO — nema ekstremnih emocija, tehnika je pouzdanija.';
+})()}
 
 ${poklapanjeIcon} POKLAPANJE SIGNALA:
 ${s.razlog_poklapanja}
