@@ -191,7 +191,153 @@ app.get('/reddit-fetch', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+// LunarCrush sentiment za valutu
+async function fetchLunarCrushSentiment(coinSymbol) {
+  try {
+    const LUNARCRUSH_API = process.env.LUNARCRUSH_API;
+    const response = await axios.get(
+      `https://lunarcrush.com/api4/public/coins/${coinSymbol.toLowerCase()}/v1`,
+      {
+        headers: {
+          'Authorization': `Bearer ${LUNARCRUSH_API}`
+        }
+      }
+    );
+    const data = response.data.data;
+    return {
+      symbol: coinSymbol,
+      galaxyScore: data.galaxy_score || null,
+      altRank: data.alt_rank || null,
+      sentiment: data.sentiment || null,
+      socialVolume: data.social_volume_24h || null,
+      socialScore: data.social_score || null
+    };
+  } catch (err) {
+    console.error(`LunarCrush greška za ${coinSymbol}:`, err.message);
+    return null;
+  }
+}
 
+// Glavni endpoint: skeniraj vijesti + sentiment + AI analiza
+app.get('/news-scan', async (req, res) => {
+  try {
+    // 1. Dohvati vijesti
+    const news = await fetchAllNews();
+    const newsText = news.slice(0, 20).map(n =>
+      `[${n.source}] ${n.title} — ${n.summary?.slice(0, 100) || ''}`
+    ).join('\n');
+
+    // 2. Dohvati LunarCrush sentiment za TOP valute
+    const coins = ['BTC', 'ETH', 'SOL', 'BNB', 'ADA', 'AVAX', 'DOT', 'LINK'];
+    const sentimentResults = [];
+    for (const coin of coins) {
+      const s = await fetchLunarCrushSentiment(coin);
+      if (s) sentimentResults.push(s);
+    }
+    const sentimentText = sentimentResults.map(s =>
+      `${s.symbol}: Galaxy Score=${s.galaxyScore}, Sentiment=${s.sentiment}, Social Volume=${s.socialVolume}`
+    ).join('\n');
+
+    // 3. AI analiza vijesti + sentimenta
+    const aiResponse = await axios.post(
+      'https://api.anthropic.com/v1/messages',
+      {
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 1500,
+        messages: [{
+          role: 'user',
+          content: `Ti si kripto analitičar. Analiziraj vijesti i sentiment podatke i pronađi TOP 3 prilike za eksplozivni rast cijene.
+
+VIJESTI (zadnjih sat vremena):
+${newsText}
+
+SENTIMENT PODATCI (LunarCrush - Twitter+Reddit):
+${sentimentText}
+
+Za svaku valutu procijeni:
+1. Slažu li se vijesti i sentiment? (poklapanje = jak signal)
+2. Ima li znakova pump & dump manipulacije?
+3. Je li rast organski ili umjetan?
+4. Kolika je pouzdanost signala?
+
+VAŽNO: 
+- Masovna organska reakcija zajednice (visok social volume) jednako je važna kao pojedinačna utjecajna vijest
+- Ako cijena već jako porasla a vijesti su tek stigle = SUMNJA NA PUMP
+- Objasni jednostavnim jezikom kao za početnike
+
+Odgovori u JSON formatu:
+{
+  "signals": [
+    {
+      "coin": "BTC",
+      "signal": "DA/NE/CEKAJ",
+      "pouzdanost": "Visoka/Srednja/Niska",
+      "poklapanje": "Vijesti i sentiment se SLAŽU/NE SLAŽU/DJELOMIČNO",
+      "pump_sumnja": true/false,
+      "razlog_poklapanja": "kratko objašnjenje zašto se slažu ili ne",
+      "vijesti_summary": "kratki sažetak relevantnih vijesti",
+      "sentiment_opis": "opis sentiment signala",
+      "preporuka": "što napraviti i zašto, jednostavnim jezikom"
+    }
+  ]
+}`
+        }]
+      },
+      {
+        headers: {
+          'x-api-key': ANTHROPIC_API,
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json'
+        }
+      }
+    );
+
+    const text = aiResponse.data.content[0].text;
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('AI nije vratio JSON');
+    const result = JSON.parse(jsonMatch[0]);
+
+    // 4. Pošalji Telegram za svaki jak signal
+    for (const s of result.signals) {
+      if (s.signal === 'DA' || s.pouzdanost === 'Visoka') {
+        const pumpIcon = s.pump_sumnja ? '⚠️ SUMNJA NA PUMP!' : '✅ Organski rast';
+        const poklapanjeIcon = s.poklapanje?.includes('SLAŽU') ? '✅' : '⚠️';
+
+        const msg = `🚨 NEWS SIGNAL - ${s.coin}
+━━━━━━━━━━━━━━━
+📰 VIJESTI:
+${s.vijesti_summary}
+
+🌐 SENTIMENT (Twitter+Reddit):
+${s.sentiment_opis}
+
+${poklapanjeIcon} POKLAPANJE SIGNALA:
+${s.razlog_poklapanja}
+
+🔍 PUMP & DUMP provjera:
+${pumpIcon}
+
+🎯 PREPORUKA:
+${s.preporuka}
+
+📊 Pouzdanost: ${s.pouzdanost}
+━━━━━━━━━━━━━━━
+⚠️ Nije financijski savjet!`;
+
+        await axios.post(
+          `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`,
+          { chat_id: TELEGRAM_CHAT_ID, text: msg }
+        );
+      }
+    }
+
+    res.json({ success: true, signals: result.signals });
+
+  } catch (error) {
+    console.error('News-scan greška:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Backend pokrenut na portu ${PORT}`);
