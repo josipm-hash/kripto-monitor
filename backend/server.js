@@ -325,11 +325,12 @@ if ((s.signal === 'DA' || s.pouzdanost === 'Visoka') && !sentNewsCache.has(cache
   sentNewsCache.add(cacheKey);
         const pumpIcon = s.pump_sumnja ? '⚠️ SUMNJA NA PUMP!' : '✅ Organski rast';
         const poklapanjeIcon = s.poklapanje?.includes('SLAŽU') ? '✅' : '⚠️';
-const fgExplanation = fearGreedText.includes('Extreme Greed') ? '🔴 Svi žele kupiti — opasnost od pada!' :
-  fearGreedText.includes('Greed') ? '🟠 Tržište je pohlepno — budi oprezan.' :
-  fearGreedText.includes('Extreme Fear') ? '🟢 Svi prodaju od straha — moguće prilike!' :
-  fearGreedText.includes('Fear') ? '🟡 Tržište je nervozno — pazi na kvalitetu.' :
-  '⚪ Neutralno — tehnika je pouzdanija.';
+const fgValue = parseInt(fearGreedText.match(/\d+/)?.[0] || '50');
+const fgExplanation = fgValue >= 80 ? '🔴 EKSTREMNA POHLEPA — svi žele kupiti, opasnost od pada!' :
+  fgValue >= 60 ? '🟠 POHLEPA — tržište je optimistično, budi oprezan.' :
+  fgValue >= 40 ? '⚪ NEUTRALNO — nema ekstremnih emocija, tehnika je pouzdanija.' :
+  fgValue >= 20 ? '🟡 STRAH — tržište je nervozno, kvalitetne valute podcijenjene.' :
+  '🟢 EKSTREMNI STRAH — svi prodaju! Historijski izvrsne prilike za kupnju!';
         const msg = `🚨 NEWS SIGNAL - ${s.coin}
 ━━━━━━━━━━━━━━━
 📰 VIJESTI:
