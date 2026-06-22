@@ -316,7 +316,18 @@ Odgovori u JSON formatu:
     const cleanText = text.replace(/[\u0000-\u001F\u007F-\u009F]/g, ' ');
 const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error('AI nije vratio JSON');
-    const result = JSON.parse(jsonMatch[0].replace(/[\u2013\u2014]/g, '-'));
+    let result;
+try {
+  const cleanJson = jsonMatch[0]
+    .replace(/[\u2013\u2014\u2015]/g, '-')
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/[\n\r\t]/g, ' ');
+  result = JSON.parse(cleanJson);
+} catch(e) {
+  console.error('JSON parse greška:', e.message);
+  throw new Error('AI vratio neispravan JSON');
+}
 
     // 4. Pošalji Telegram za svaki jak signal
     for (const s of result.signals) {
