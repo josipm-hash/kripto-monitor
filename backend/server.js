@@ -433,8 +433,9 @@ ${preporukaBlok}
     }
 
     res.json({ success: true, signals: result.signals });
-  } catch (error) {
-    console.error('News-scan greška:', error.message);
+} catch (error) {
+  console.error('News-scan greška:', error.message);
+  console.error('Detalji:', error.response?.data);
     res.status(500).json({ error: error.message });
   }
 });
