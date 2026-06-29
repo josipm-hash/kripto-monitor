@@ -179,7 +179,7 @@ app.post('/telegram', async (req, res) => {
     const { text } = req.body;
     await axios.post(
       `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`,
-      { chat_id: TELEGRAM_CHAT_ID, text, parse_mode: 'HTML' }
+{ chat_id: TELEGRAM_CHAT_ID, text }
     );
     res.json({ success: true });
   } catch (error) {
