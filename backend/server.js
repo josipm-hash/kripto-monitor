@@ -427,7 +427,7 @@ ${preporukaBlok}
 
         await axios.post(
           `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`,
-          { chat_id: TELEGRAM_CHAT_ID, text: msg }
+{ chat_id: TELEGRAM_CHAT_ID, text: msg.slice(0, 4000) }
         );
       }
     }
