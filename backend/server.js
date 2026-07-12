@@ -384,10 +384,10 @@ Volume spike: ${coinData.volumeSpike ? 'DA ⚠️' : 'NE'}`;
           const support = parseFloat(coinData.support);
           const resistance = parseFloat(coinData.resistance);
           const ulaz = price?.toFixed(2);
-          const tp = (price + (resistance - price) * 0.7)?.toFixed(2);
-          const sl = (price - (price - support) * 0.5)?.toFixed(2);
-          const rizik = (price - sl).toFixed(2);
-          const nagrada = (tp - price).toFixed(2);
+         const tp = (price * 1.08).toFixed(2);
+          const sl = (price * 0.95).toFixed(2);
+          const rizik = (price - parseFloat(sl)).toFixed(2);
+          const nagrada = (parseFloat(tp) - price).toFixed(2);
           const rr = rizik > 0 ? `1:${(nagrada / rizik).toFixed(1)}` : 'N/A';
 
           preporukaBlok = `${s.preporuka}
