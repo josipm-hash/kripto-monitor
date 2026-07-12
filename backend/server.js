@@ -340,7 +340,8 @@ Odgovori u JSON formatu:
         .replace(/[\u2013\u2014\u2015]/g, '-')
         .replace(/[\u2018\u2019]/g, "'")
         .replace(/[\u201C\u201D]/g, '"')
-        .replace(/[\n\r\t]/g, ' ');
+        .replace(/[\n\r\t]/g, ' ')
+      .replace(/[^\x20-\x7E\u00C0-\u024F\u0400-\u04FF]/g, '');
       result = JSON.parse(cleanJson);
     } catch (e) {
       console.error('JSON parse greška:', e.message);
